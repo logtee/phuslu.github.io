@@ -50,19 +50,6 @@ def getip_from_akamai():
     return ip
 
 
-def getip_from_3322():
-    ip = urlopen('http://ip.3322.net/', timeout=5).read()
-    return ip
-
-
-def f3322_ddns(username, password, hostname, ip):
-    api_url = 'http://members.3322.net/dyndns/update?hostname=%s&myip=%s&wildcard=OFF&offline=NO' % (hostname, ip)
-    data = username + ':' + password
-    headers = {'Authorization': 'Basic %s' % base64.b64encode(data.encode()).decode()}
-    resp = urlopen(Request(api_url, data=None, headers=headers), timeout=5)
-    logging.info('f3322_ddns hostname=%r to ip=%r result: %s', hostname, ip, resp.read())
-
-
 def cx_ddns(api_key, api_secret, domain, ip=''):
     lip = socket.gethostbyname(domain)
     rip = getip_from_akamai()

@@ -30,19 +30,19 @@
 	head.add('meta').attr('name', 'viewport').attr('content', 'width=device-width,initial-scale=1')
 
 	if (!document.title) {
-		s = "<div class=\"container\">\n"
-		s += "<h3>nginx.conf</h3>\n"
-		s += "<textarea rows=8 cols=50>\n"
-		s += "# download autoindex.html to /wwwroot\n"
-		s += "location ~ ^(.*)/$ {\n"
-		s += "    autoindex       on;\n"
-		s += "    autoindex_localtime on;\n"
-		s += "    autoindex_exact_size off;\n"
-		s += "    add_after_body /autoindex.html;\n"
-		s += "}\n"
-		s += "</textarea>\n"
-		s += "</div>\n"
-		document.write(s)
+		a =["<div class=\"container\">",
+			"<h3>nginx.conf</h3>",
+			"<textarea rows=8 cols=50>",
+			"# download autoindex.html to /wwwroot",
+			"location ~ ^(.*)/$ {",
+			"    autoindex       on;",
+			"    autoindex_localtime on;",
+			"    autoindex_exact_size off;",
+			"    add_after_body /autoindex.html;",
+			"}",
+			"</textarea>",
+			"</div>"]
+		document.write(a.join("\n"))
 		return
 	}
 
@@ -212,4 +212,3 @@ table.table-hover > tbody > tr:hover > th {
 	background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='16' viewBox='0 0 12 16'%3E%3Cpath d='M8.5 1L1 1C0.4 1 0 1.4 0 2L0 14C0 14.6 0.4 15 1 15L11 15C11.6 15 12 14.6 12 14L12 4.5 8.5 1ZM11 14L1 14 1 2 4 2 4 3 5 3 5 2 8 2 11 5 11 14 11 14ZM5 4L5 3 6 3 6 4 5 4 5 4ZM4 4L5 4 5 5 4 5 4 4 4 4ZM5 6L5 5 6 5 6 6 5 6 5 6ZM4 6L5 6 5 7 4 7 4 6 4 6ZM5 8L5 7 6 7 6 8 5 8 5 8ZM4 9.3C3.4 9.6 3 10.3 3 11L3 12 7 12 7 11C7 9.9 6.1 9 5 9L5 8 4 8 4 9.3 4 9.3ZM6 10L6 11 4 11 4 10 6 10 6 10Z' fill='%237D94AE'/%3E%3C/svg%3E");
 }
 </style>
-

@@ -30,17 +30,16 @@
 	head.add('meta').attr('name', 'viewport').attr('content', 'width=device-width,initial-scale=1')
 
 	if (!document.body) {
-		s = "<div class=\"container\">\n"
-		s += "<h3>nginx.conf</h3>\n"
-		s += "<textarea rows=6 cols=50>\n"
-		s += "# download markdown.html to /wwwroot\n"
-		s += "location ~ \.md$ {\n"
-		s += "    default_type text/html;\n"
-		s += "    add_after_body /markdown.html;\n"
-		s += "}\n"
-		s += "</textarea>\n"
-		s += "</div>\n"
-		document.write(s)
+		document.write(["<div class=\"container\">",
+		"<h3>nginx.conf</h3>",
+		"<textarea rows=6 cols=50>",
+		"# download markdown.html to /wwwroot",
+		"location ~ \\.md$ {",
+		"    default_type text/html;",
+		"    add_after_body /markdown.html;",
+		"}",
+		"</textarea>",
+		"</div>"].join("\n"))
 		return
 	}
 

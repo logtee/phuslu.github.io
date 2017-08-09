@@ -40,19 +40,18 @@
 	head.add('meta').attr('name', 'viewport').attr('content', 'width=device-width,initial-scale=1')
 
 	if (!document.title) {
-		a =["<div class=\"container\">",
-			"<h3>nginx.conf</h3>",
-			"<textarea rows=8 cols=50>",
-			"# download autoindex.html to /wwwroot",
-			"location ~ ^(.*)/$ {",
-			"    autoindex       on;",
-			"    autoindex_localtime on;",
-			"    autoindex_exact_size off;",
-			"    add_after_body /autoindex.html;",
-			"}",
-			"</textarea>",
-			"</div>"]
-		document.write(a.join("\n"))
+		document.write(["<div class=\"container\">",
+		"<h3>nginx.conf</h3>",
+		"<textarea rows=8 cols=50>",
+		"# download autoindex.html to /wwwroot",
+		"location ~ ^(.*)/$ {",
+		"    autoindex       on;",
+		"    autoindex_localtime on;",
+		"    autoindex_exact_size off;",
+		"    add_after_body /autoindex.html;",
+		"}",
+		"</textarea>",
+		"</div>"].join("\n"))
 		return
 	}
 

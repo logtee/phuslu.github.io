@@ -128,7 +128,7 @@ def capture(url, wait_for_text='', selector='body', viewport_size='800x450', fil
     os.chmod(htmlfile, 0o666)
 
 
-def tcptop(pid=None, interval='1'):
+def tcptop(pid=None, no_port=False, interval='1'):
     if not os.environ.get('WATCHED'):
         os.environ['WATCHED'] = '1'
         os.execv('/usr/bin/watch', ['watch', '-n' + interval, ' '.join(sys.argv)])
@@ -158,6 +158,19 @@ def tcptop(pid=None, interval='1'):
         raddr = raddr.lstrip('::ffff:')
         if bytes_acked and bytes_received and state.startswith('ESTAB'):
             info[laddr, raddr] = (apid, comm, bytes_acked, bytes_received)
+    if no_port:
+        new_info = {}
+        for (laddr, raddr), (pid, comm, bytes_acked, bytes_received) in info.items():
+            laddr = laddr.rsplit(':', 1)[0]
+            raddr = raddr.rsplit(':', 1)[0]
+            try:
+                parts = new_info[laddr, raddr]
+                parts[-2] += bytes_acked
+                parts[-1] += bytes_received
+                new_info[laddr, raddr] = parts
+            except KeyError:
+                new_info[laddr, raddr] = [pid, comm, bytes_acked, bytes_received]
+        info = new_info
     print("%-6s %-12s %-21s %-21s %6s %6s" % ("PID", "COMM", "LADDR", "RADDR", "RX_KB", "TX_KB"))
     infolist = sorted(info.items(), key=lambda x:(-x[1][-2], -x[1][-1]))
     for (laddr, raddr), (pid, comm, bytes_acked, bytes_received) in infolist:

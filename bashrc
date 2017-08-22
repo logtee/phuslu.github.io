@@ -10,6 +10,7 @@ alias ll='ls -alF'
 alias rm='rm -i'
 alias mv='mv -i'
 alias cp='cp -i'
+export LC_ALL=en_US.UTF-8
 export HISTTIMEFORMAT="%Y-%m-%d %T "
 export HISTCONTROL=ignoreboth
 export HISTSIZE=100000

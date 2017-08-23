@@ -359,28 +359,15 @@ if ($_GET['act'] == "iploc")
   $ip = $_SERVER['REMOTE_ADDR'];
 
   $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, "https://www.ipip.net/ip.html");
-  curl_setopt($ch, CURLOPT_REFERER, "https://www.ipip.net/");
+  curl_setopt($ch, CURLOPT_URL, "http://ip.cn/?ip=" . $ip);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.47.0");
-  curl_setopt($ch, CURLOPT_POST, 1);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, "ip=".$ip);
   $result = curl_exec($ch);
   curl_close($ch);
 
-  $jarr = array();
-  if (preg_match("/<span id=\"myself\">\s*(.+?)\s*</", $result, $matches))
-  {
-    array_push($jarr, $matches[1]);
-  }
-  preg_match_all('/<div style=".*?color:red;.*?">(.+?)<\/div>/', $result, $matches);
-  if (count($matches) > 1)
-  {
-    array_push($jarr, preg_replace('/\s+/', '', end($matches[1])));
-  }
-
+  $addr = trim(substr($result, strrpos($result, '：')+3));
   $_GET['callback'] = htmlspecialchars($_GET['callback']);
-  echo $_GET['callback'],'(',json_encode($jarr),')';
+  echo $_GET['callback'],'(',json_encode($addr),')';
   exit;
 }
 
@@ -877,11 +864,7 @@ function getCPUData()
 
 document.addEventListener('DOMContentLoaded', function(){
   $.getJSON('?act=iploc&callback=?', function (data) {
-    if (data[1] != null && data[1].substring(0,4) == data[0].substring(0,4)) {
-      $("#iploc").html(data[1] + data[0].replace(/^\S+/, ''));
-    } else {
-      $("#iploc").html(data[0]);
-    }
+    $("#iploc").html(data);
   });
 });
 </script>

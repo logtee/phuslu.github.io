@@ -402,7 +402,7 @@ body {margin:0;font-family:Tahoma,"Microsoft Yahei",Arial,Serif;}
   <tr><th colspan="4">服务器参数</th></tr>
   <tr>
     <td>服务器域名/IP 地址</td>
-    <td colspan="3"><?php echo @get_current_user();?> - <?php echo $_SERVER['SERVER_NAME'];?>(<?php echo @gethostbyname($_SERVER['SERVER_NAME']); ?>)&nbsp;&nbsp;你的 IP 地址是：<?php echo @$_SERVER['REMOTE_ADDR'];?> (<span id="iploc">未知位置</span>)</td>
+    <td colspan="3"><?php echo @get_current_user();?> - <?php echo $_SERVER['SERVER_NAME'];?>(<?php echo @gethostbyname($_SERVER['SERVER_NAME']); ?>)&nbsp;&nbsp;你的 IP 地址是：<?php echo @$_SERVER['REMOTE_ADDR'];?> <span id="iploc"></span></td>
   </tr>
   <tr>
     <td>服务器标识</td>
@@ -864,7 +864,7 @@ function getCPUData()
 
 document.addEventListener('DOMContentLoaded', function(){
   $.getJSON('?act=iploc&callback=?', function (data) {
-    $("#iploc").html(data);
+    $("#iploc").html('('+data+')');
   });
 });
 </script>

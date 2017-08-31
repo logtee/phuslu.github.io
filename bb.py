@@ -46,7 +46,7 @@ def getip(iface=''):
 
 
 def getip_from_akamai():
-    ip = urlopen('http://whatismyip.akamai.com/', timeout=5).read()
+    ip = urlopen('http://whatismyip.akamai.com/', timeout=5).read().decode()
     return ip
 
 
@@ -84,6 +84,27 @@ def cx_update(api_key, api_secret, domain_id, host, ip):
     resp = urlopen(request, timeout=5)
     logging.info('cx_update update domain_id=%r host=%r ip=%r result: %r', domain_id, host, ip, resp.read())
     return
+
+
+def cf_ddns(auth_email, auth_key, zone_name, record_name, ip=''):
+    lip = socket.gethostbyname(record_name)
+    ip = getip_from_akamai()
+    if lip == ip:
+        logging.info('remote ip and local ip is same to %s, exit.', lip)
+        return
+    api_url = 'https://api.cloudflare.com/client/v4/zones?name=%s' % zone_name
+    headers = {'X-Auth-Email': auth_email, 'X-Auth-Key': auth_key, 'Content-Type': 'application/json'}
+    resp = urlopen(Request(api_url, headers=headers), timeout=5)
+    zone_id = json.loads(resp.read().decode())['result'][0]['id']
+    api_url = 'https://api.cloudflare.com/client/v4/zones/%s/dns_records?name=%s' % (zone_id, record_name)
+    resp = urlopen(Request(api_url, headers=headers), timeout=5)
+    record_id = json.loads(resp.read().decode())['result'][0]['id']
+    api_url = 'https://api.cloudflare.com/client/v4/zones/%s/dns_records/%s' % (zone_id, record_id)
+    data = json.dumps({'id': zone_id, 'type': 'A', 'name': record_name, 'content': ip})
+    req = Request(api_url, data=data.encode(), headers=headers)
+    req.get_method = lambda: 'PUT'
+    resp = urlopen(req, timeout=5)
+    logging.info('cf_ddns record_name=%r to ip=%r result: %s', record_name, ip, resp.read())
 
 
 def wol(mac='18:66:DA:17:A2:95', broadcast='192.168.1.255'):
@@ -174,7 +195,7 @@ def tcptop(pid=None, no_port=False, interval='1'):
     print("%-6s %-12s %-21s %-21s %6s %6s" % ("PID", "COMM", "LADDR", "RADDR", "RX_KB", "TX_KB"))
     infolist = sorted(info.items(), key=lambda x:(-x[1][-2], -x[1][-1]))
     for (laddr, raddr), (pid, comm, bytes_acked, bytes_received) in infolist:
-        rx_kb  = bytes_received//1024 
+        rx_kb  = bytes_received//1024
         tx_kb  = bytes_acked//1024
         if rx_kb == 0 or tx_kb == 0:
             continue

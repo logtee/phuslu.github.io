@@ -33,7 +33,25 @@ else:
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
-def getip(iface=''):
+
+def getip():
+    urls = [
+        'http://whatismyip.akamai.com/',
+        'http://checkip.amazonaws.com/',
+    ]
+    result = Queue()
+    def _fetch(url):
+        result.put(urlopen(url, timeout=5))
+        logging.info('getip() from %r', url)
+    for url in urls:
+        t = threading.Thread(target=_fetch, args=(url,))
+        t.setDaemon(True)
+        t.start()
+    ip = result.get().read().decode()
+    return ip
+
+
+def ipaddr(iface=''):
     if not iface:
         sock = socket.socket()
         sock = socket.socket(type=socket.SOCK_DGRAM)
@@ -48,26 +66,9 @@ def getip(iface=''):
             return addr.split('/')[0]
 
 
-def fetchip():
-    urls = [
-        'http://whatismyip.akamai.com/',
-        'http://checkip.amazonaws.com/',
-    ]
-    result = Queue()
-    def _fetch(url):
-        result.put(urlopen(url, timeout=5))
-        logging.info('fetchip() from %r', url)
-    for url in urls:
-        t = threading.Thread(target=_fetch, args=(url,))
-        t.setDaemon(True)
-        t.start()
-    ip = result.get().read().decode()
-    return ip
-
-
 def cx_ddns(api_key, api_secret, domain, ip=''):
     lip = socket.gethostbyname(domain)
-    rip = fetchip()
+    rip = getip()
     if lip == rip:
         logging.info('remote ip and local ip is same to %s, exit.', lip)
         return
@@ -103,7 +104,7 @@ def cx_update(api_key, api_secret, domain_id, host, ip):
 
 def cf_ddns(auth_email, auth_key, zone_name, record_name, ip=''):
     lip = socket.gethostbyname(record_name)
-    ip = fetchip()
+    ip = getip()
     if lip == ip:
         logging.info('remote ip and local ip is same to %s, exit.', lip)
         return

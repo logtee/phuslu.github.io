@@ -123,7 +123,7 @@ def cf_ddns(auth_email, auth_key, zone_name, record_name, ip=''):
     logging.info('cf_ddns record_name=%r to ip=%r result: %s', record_name, ip, resp.read())
 
 
-def wol(mac='18:66:DA:17:A2:95', broadcast='192.168.1.255'):
+def wol(mac='18:66:DA:17:A2:95', broadcast='192.168.2.255'):
     if len(mac) == 12:
         pass
     elif len(mac) == 12 + 5:

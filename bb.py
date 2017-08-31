@@ -19,13 +19,16 @@ import socket
 import struct
 import sys
 import telnetlib
+import threading
 import time
 
 if PY3:
     from urllib.request import urlopen, Request
+    from queue import Queue
     from itertools import zip_longest
 else:
     from urllib2 import urlopen, Request
+    from Queue import Queue
     from itertools import izip_longest as zip_longest
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -45,14 +48,26 @@ def getip(iface=''):
             return addr.split('/')[0]
 
 
-def getip_from_akamai():
-    ip = urlopen('http://whatismyip.akamai.com/', timeout=5).read().decode()
+def fetchip():
+    urls = [
+        'http://whatismyip.akamai.com/',
+        'http://checkip.amazonaws.com/',
+    ]
+    result = Queue()
+    def _fetch(url):
+        result.put(urlopen(url, timeout=5))
+        logging.info('fetchip() from %r', url)
+    for url in urls:
+        t = threading.Thread(target=_fetch, args=(url,))
+        t.setDaemon(True)
+        t.start()
+    ip = result.get().read().decode()
     return ip
 
 
 def cx_ddns(api_key, api_secret, domain, ip=''):
     lip = socket.gethostbyname(domain)
-    rip = getip_from_akamai()
+    rip = fetchip()
     if lip == rip:
         logging.info('remote ip and local ip is same to %s, exit.', lip)
         return
@@ -88,7 +103,7 @@ def cx_update(api_key, api_secret, domain_id, host, ip):
 
 def cf_ddns(auth_email, auth_key, zone_name, record_name, ip=''):
     lip = socket.gethostbyname(record_name)
-    ip = getip_from_akamai()
+    ip = fetchip()
     if lip == ip:
         logging.info('remote ip and local ip is same to %s, exit.', lip)
         return

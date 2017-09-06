@@ -102,19 +102,26 @@ def cx_update(api_key, api_secret, domain_id, host, ip):
     return
 
 
-def cf_ddns(auth_email, auth_key, zone_name, record_name, ip=''):
+def cf_ddns(auth_email, auth_key, zone, record_name, ip=''):
     lip = socket.gethostbyname(record_name)
     ip = getip()
     if lip == ip:
         logging.info('remote ip and local ip is same to %s, exit.', lip)
-        return
-    api_url = 'https://api.cloudflare.com/client/v4/zones?name=%s' % zone_name
-    headers = {'X-Auth-Email': auth_email, 'X-Auth-Key': auth_key, 'Content-Type': 'application/json'}
-    resp = urlopen(Request(api_url, headers=headers), timeout=5)
-    zone_id = json.loads(resp.read().decode())['result'][0]['id']
-    api_url = 'https://api.cloudflare.com/client/v4/zones/%s/dns_records?name=%s' % (zone_id, record_name)
-    resp = urlopen(Request(api_url, headers=headers), timeout=5)
-    record_id = json.loads(resp.read().decode())['result'][0]['id']
+    if '.' not in zone:
+        zone_name = zone
+        zone_id = zone
+    else:
+        zone_name = zone
+        api_url = 'https://api.cloudflare.com/client/v4/zones?name=%s' % zone_name
+        headers = {'X-Auth-Email': auth_email, 'X-Auth-Key': auth_key, 'Content-Type': 'application/json'}
+        resp = urlopen(Request(api_url, headers=headers), timeout=5)
+        zone_id = json.loads(resp.read().decode())['result'][0]['id']
+    if '.' not in record_name:
+        record_id = record_name
+    else:
+        api_url = 'https://api.cloudflare.com/client/v4/zones/%s/dns_records?name=%s' % (zone_id, record_name)
+        resp = urlopen(Request(api_url, headers=headers), timeout=5)
+        record_id = json.loads(resp.read().decode())['result'][0]['id']
     api_url = 'https://api.cloudflare.com/client/v4/zones/%s/dns_records/%s' % (zone_id, record_id)
     data = json.dumps({'id': zone_id, 'type': 'A', 'ttl': 300, 'proxied': False, 'name': record_name, 'content': ip})
     req = Request(api_url, data=data.encode(), headers=headers)

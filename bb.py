@@ -107,6 +107,7 @@ def cf_ddns(auth_email, auth_key, zone, record_name, ip=''):
     ip = getip()
     if lip == ip:
         logging.info('remote ip and local ip is same to %s, exit.', lip)
+        return
     headers = {'X-Auth-Email': auth_email, 'X-Auth-Key': auth_key, 'Content-Type': 'application/json'}
     if '.' not in zone:
         zone_name = zone

@@ -47,7 +47,7 @@ def getip():
         t = threading.Thread(target=_fetch, args=(url,))
         t.setDaemon(True)
         t.start()
-    ip = result.get().read().decode()
+    ip = result.get().read().decode().strip()
     return ip
 
 
@@ -107,13 +107,13 @@ def cf_ddns(auth_email, auth_key, zone, record_name, ip=''):
     ip = getip()
     if lip == ip:
         logging.info('remote ip and local ip is same to %s, exit.', lip)
+    headers = {'X-Auth-Email': auth_email, 'X-Auth-Key': auth_key, 'Content-Type': 'application/json'}
     if '.' not in zone:
         zone_name = zone
         zone_id = zone
     else:
         zone_name = zone
         api_url = 'https://api.cloudflare.com/client/v4/zones?name=%s' % zone_name
-        headers = {'X-Auth-Email': auth_email, 'X-Auth-Key': auth_key, 'Content-Type': 'application/json'}
         resp = urlopen(Request(api_url, headers=headers), timeout=5)
         zone_id = json.loads(resp.read().decode())['result'][0]['id']
     if '.' not in record_name:

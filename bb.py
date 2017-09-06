@@ -116,9 +116,10 @@ def cf_ddns(auth_email, auth_key, zone_name, record_name, ip=''):
     resp = urlopen(Request(api_url, headers=headers), timeout=5)
     record_id = json.loads(resp.read().decode())['result'][0]['id']
     api_url = 'https://api.cloudflare.com/client/v4/zones/%s/dns_records/%s' % (zone_id, record_id)
-    data = json.dumps({'id': zone_id, 'type': 'A', 'name': record_name, 'content': ip})
+    data = json.dumps({'id': zone_id, 'type': 'A', 'ttl': 300, 'proxied': False, 'name': record_name, 'content': ip})
     req = Request(api_url, data=data.encode(), headers=headers)
     req.get_method = lambda: 'PUT'
+    logging.info('cf_ddns updating record_name=%r to ip=%r', record_name, ip)
     resp = urlopen(req, timeout=5)
     logging.info('cf_ddns record_name=%r to ip=%r result: %s', record_name, ip, resp.read())
 
